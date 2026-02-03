@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة كانبان - تكوين للهندسة</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar (Same as dashboard) */
+        .sidebar {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            padding: 20px 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .logo h2 {
+            font-size: 24px;
+            color: #2563eb;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .menu-item.active {
+            background: #2563eb;
+            color: white;
+            border-right: 4px solid #60a5fa;
+        }
+
+        /* Top Bar */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 260px;
+            height: 70px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 999;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .topbar-left h2 {
+            font-size: 20px;
+            color: #1f2937;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .filter-btn:hover {
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+
+        .btn-add-task {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s;
+        }
+
+        .btn-add-task:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-right: 260px;
+            margin-top: 70px;
+            padding: 30px;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Kanban Board */
+        .kanban-board {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+        }
+
+        .kanban-column {
+            flex: 0 0 320px;
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 15px;
+            min-height: 500px;
+        }
+
+        .column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .column-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .column-count {
+            background: #e5e7eb;
+            color: #6b7280;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .column-count.backlog { background: #dbeafe; color: #1e40af; }
+        .column-count.todo { background: #fef3c7; color: #d97706; }
+        .column-count.progress { background: #ddd6fe; color: #7c3aed; }
+        .column-count.review { background: #fed7aa; color: #ea580c; }
+        .column-count.done { background: #d1fae5; color: #059669; }
+
+        .card-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 100px;
+        }
+
+        .task-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            cursor: grab;
+            transition: all 0.3s;
+            border-right: 4px solid #e5e7eb;
+        }
+
+        .task-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .task-card.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .task-card.high-priority {
+            border-right-color: #ef4444;
+        }
+
+        .task-card.medium-priority {
+            border-right-color: #f59e0b;
+        }
+
+        .task-card.low-priority {
+            border-right-color: #10b981;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .task-title {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 14px;
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        .task-priority {
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .priority-high {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .priority-medium {
+            background: #fed7aa;
+            color: #ea580c;
+        }
+
+        .priority-low {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .task-description {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .task-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .task-assignee {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .assignee-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .assignee-name {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .task-tags {
+            display: flex;
+            gap: 5px;
+        }
+
+        .task-tag {
+            padding: 3px 8px;
+            background: #f3f4f6;
+            border-radius: 6px;
+            font-size: 10px;
+            color: #6b7280;
+        }
+
+        .task-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .task-date {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .task-kpi {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: #fef3c7;
+            padding: 3px 8px;
+            border-radius: 6px;
+            color: #d97706;
+            font-weight: 600;
+        }
+
+        /* Drag and Drop Styles */
+        .card-list.drag-over {
+            background: rgba(37, 99, 235, 0.1);
+            border: 2px dashed #2563eb;
+            border-radius: 8px;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(100%);
+            }
+
+            .main-content {
+                margin-right: 0;
+            }
+
+            .topbar {
+                right: 0;
+            }
+
+            .kanban-column {
+                flex: 0 0 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <h2>تكوين</h2>
+            <p style="font-size: 11px; opacity: 0.7;">TAKWEEN ENGINEERING</p>
+        </div>
+
+        <div class="menu-item">
+            <span>📊</span>
+            <span>لوحة التحكم</span>
+        </div>
+        <div class="menu-item">
+            <span>👥</span>
+            <span>الموظفين</span>
+        </div>
+        <div class="menu-item">
+            <span>📋</span>
+            <span>المهام</span>
+        </div>
+        <div class="menu-item active">
+            <span>🎯</span>
+            <span>لوحة كانبان</span>
+        </div>
+        <div class="menu-item">
+            <span>⚡</span>
+            <span>السبرنت</span>
+        </div>
+    </div>
+
+    <!-- Top Bar -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <h2>🎯 لوحة كانبان</h2>
+            <div class="filter-group">
+                <select class="filter-btn">
+                    <option>كل الأقسام</option>
+                    <option>المعماري</option>
+                    <option>الإنشائي</option>
+                    <option>التصميم الداخلي</option>
+                    <option>التسويق</option>
+                    <option>HR</option>
+                    <option>المحاسبة</option>
+                </select>
+                <select class="filter-btn">
+                    <option>كل الأولويات</option>
+                    <option>عالية</option>
+                    <option>متوسطة</option>
+                    <option>منخفضة</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="btn-add-task">
+            <span>➕</span>
+            <span>إضافة مهمة جديدة</span>
+        </button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value" style="color: #3b82f6;">8</div>
+                <div class="stat-label">قائمة الانتظار</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" style="color: #f59e0b;">15</div>
+                <div class="stat-label">للتنفيذ</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" style="color: #8b5cf6;">23</div>
+                <div class="stat-label">قيد التنفيذ</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" style="color: #f97316;">12</div>
+                <div class="stat-label">قيد المراجعة</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" style="color: #10b981;">34</div>
+                <div class="stat-label">مكتملة</div>
+            </div>
+        </div>
+
+        <!-- Kanban Board -->
+        <div class="kanban-board">
+            <!-- Backlog Column -->
+            <div class="kanban-column">
+                <div class="column-header">
+                    <div class="column-title">
+                        <span>📥</span>
+                        <span>قائمة الانتظار</span>
+                    </div>
+                    <div class="column-count backlog">8</div>
+                </div>
+                <div class="card-list" data-status="backlog">
+                    <div class="task-card low-priority" draggable="true">
+                        <div class="task-header">
+                            <div class="task-title">تصميم واجهة المبنى السكني الجديد</div>
+                            <div class="task-priority priority-low">منخفضة</div>
+                        </div>
+                        <div class="task-description">تصميم الواجهة الخارجية للمشروع السكني بالمنطقة الشرقية</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar">م.س</div>
+                                <div class="assignee-name">محمد سعيد</div>
+                            </div>
+                            <div class="task-tags">
+                                <div class="task-tag">معماري</div>
+                            </div>
+                        </div>
+                        <div class="task-footer">
+                            <div class="task-date">📅 15 فبراير</div>
+                            <div class="task-kpi">⭐ 25 نقطة</div>
+                        </div>
+                    </div>
+
+                    <div class="task-card medium-priority" draggable="true">
+                        <div class="task-header">
+                            <div class="task-title">حساب الأحمال الإنشائية</div>
+                            <div class="task-priority priority-medium">متوسطة</div>
+                        </div>
+                        <div class="task-description">حساب الأحمال للمبنى التجاري</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar" style="background: linear-gradient(135deg, #10b981, #059669);">ع.م</div>
+                                <div class="assignee-name">عمر محمود</div>
+                            </div>
+                            <div class="task-tags">
+                                <div class="task-tag">إنشائي</div>
+                            </div>
+                        </div>
+                        <div class="task-footer">
+                            <div class="task-date">📅 18 فبراير</div>
+                            <div class="task-kpi">⭐ 30 نقطة</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- To Do Column -->
+            <div class="kanban-column">
+                <div class="column-header">
+                    <div class="column-title">
+                        <span>📋</span>
+                        <span>للتنفيذ</span>
+                    </div>
+                    <div class="column-count todo">15</div>
+                </div>
+                <div class="card-list" data-status="todo">
+                    <div class="task-card high-priority" draggable="true">
+                        <div class="task-header">
+                            <div class="task-title">مراجعة المخططات الإنشائية - برج الأعمال</div>
+                            <div class="task-priority priority-high">عالية</div>
+                        </div>
+                        <div class="task-description">مراجعة شاملة للمخططات مع المقاول</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar" style="background: linear-gradient(135deg, #f59e0b, #d97706);">أ.ع</div>
+                                <div class="assignee-name">أحمد علي</div>
+                            </div>
+                            <div class="task-tags">
+                                <div class="task-tag">إنشائي</div>
+                            </div>
+                        </div>
+                        <div class="task-footer">
+                            <div class="task-date">📅 10 فبراير</div>
+                            <div class="task-kpi">⭐ 50 نقطة</div>
+                        </div>
+                    </div>
+
+                    <div class="task-card medium-priority" draggable="true">
+                        <div class="task-header">
+                            <div class="task-title">تصميم ديكور المطعم</div>
+                            <div class="task-priority priority-medium">متوسطة</div>
+                        </div>
+                        <div class="task-description">تصميم داخلي كامل لمطعم فاخر</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar" style="background: linear-gradient(135deg, #ec4899, #db2777);">س.خ</div>
+                                <div class="assignee-name">سارة خالد</div>
+                            </div>
+                            <div class="task-tags">
+                                <div class="task-tag">تصميم داخلي</div>
+                            </div>
+                        </div>
+                        <div class="task-footer">
+                            <div class="task-date">📅 12 فبراير</div>
+                            <div class="task-kpi">⭐ 40 نقطة</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- In Progress Column -->
+            <div class="kanban-column">
+                <div class="column-header">
+                    <div class="column-title">
+                        <span>⚡</span>
+                        <span>قيد التنفيذ</span>
+                    </div>
+                    <div class="column-count progress">23</div>
+                </div>
+                <div class="card-list" data-status="progress">
+                    <div class="task-card high-priority" draggable="true">
+                        <div class="task-header">
+                            <div class="task-title">حملة تسويقية لمشروع الواحة</div>
+                            <div class="task-priority priority-high">عالية</div>
+                        </div>
+                        <div class="task-description">إطلاق حملة على السوشيال ميديا</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">ف.ع</div>
+                                <div class="assignee-name">فاطمة علي</div>
+                            </div>
+                            <div class="task-tags">
+                                <div class="task-tag">تسويق</div>
+                            </div>
+                        </div>
+                        <div class="task-footer">
+                            <div class="task-date">📅 8 فبراير</div>
+                            <div class="task-kpi">⭐ 35 نقطة</div>
+                        </div>
+                    </div>
+
+                    <div class="task-card medium-priority" draggable="true">
+                        <div class="task-header">
+                            <div class="task-title">إعداد ملف AutoCAD للفيلا</div>
+                            <div class="task-priority priority-medium">متوسطة</div>
+                        </div>
+                        <div class="task-description">تجهيز المخططات الكاملة بصيغة DWG</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar">خ.م</div>
+                                <div class="assignee-name">خالد محمد</div>
+                            </div>
+                            <div class="task-tags">
+                                <div class="task-tag">معماري</div>
+                            </div>
+                        </div>
+                        <div class="task-footer">
+                            <div class="task-date">📅 9 فبراير</div>
+                            <div class="task-kpi">⭐ 30 نقطة</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- In Review Column -->
+            <div class="kanban-column">
+                <div class="column-header">
+                    <div class="column-title">
+                        <span>👁️</span>
+                        <span>قيد المراجعة</span>
+                    </div>
+                    <div class="column-count review">12</div>
+                </div>
+                <div class="card-list" data-status="review">
+                    <div class="task-card low-priority" draggable="true">
+                        <div class="task-header">
+                            <div class="task-title">تقرير الحضور الشهري</div>
+                            <div class="task-priority priority-low">منخفضة</div>
+                        </div>
+                        <div class="task-description">إعداد تقرير شامل لحضور يناير</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">ن.أ</div>
+                                <div class="assignee-name">نورة أحمد</div>
+                            </div>
+                            <div class="task-tags">
+                                <div class="task-tag">HR</div>
+                            </div>
+                        </div>
+                        <div class="task-footer">
+                            <div class="task-date">📅 5 فبراير</div>
+                            <div class="task-kpi">⭐ 20 نقطة</div>
+                        </div>
+                    </div>
+
+                    <div class="task-card medium-priority" draggable="true">
+                        <div class="task-header">
+                            <div class="task-title">القوائم المالية Q4</div>
+                            <div class="task-priority priority-medium">متوسطة</div>
+                        </div>
+                        <div class="task-description">مراجعة الحسابات الختامية للربع الرابع</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar" style="background: linear-gradient(135deg, #ef4444, #dc2626);">ي.س</div>
+                                <div class="assignee-name">يوسف سالم</div>
+                            </div>
+                            <div class="task-tags">
+                                <div class="task-tag">محاسبة</div>
+                            </div>
+                        </div>
+                        <div class="task-footer">
+                            <div class="task-date">📅 6 فبراير</div>
+                            <div class="task-kpi">⭐ 45 نقطة</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Done Column -->
+            <div class="kanban-column">
+                <div class="column-header">
+                    <div class="column-title">
+                        <span>✅</span>
+                        <span>مكتملة</span>
+                    </div>
+                    <div class="column-count done">34</div>
+                </div>
+                <div class="card-list" data-status="done">
+                    <div class="task-card high-priority" draggable="true">
+                        <div class="task-header">
+                            <div class="task-title">تسليم مشروع الشقق السكنية</div>
+                            <div class="task-priority priority-high">عالية</div>
+                        </div>
+                        <div class="task-description">تم تسليم المشروع بنجاح للعميل</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar">م.ع</div>
+                                <div class="assignee-name">ماجد عبدالله</div>
+                            </div>
+                            <div class="task-tags">
+                                <div class="task-tag">معماري</div>
+                            </div>
+                        </div>
+                        <div class="task-footer">
+                            <div class="task-date">✅ 2 فبراير</div>
+                            <div class="task-kpi" style="background: #d1fae5; color: #059669;">⭐ 60 نقطة</div>
+                        </div>
+                    </div>
+
+                    <div class="task-card medium-priority" draggable="true">
+                        <div class="task-header">
+                            <div class="task-title">تصميم الكتالوج التسويقي</div>
+                            <div class="task-priority priority-medium">متوسطة</div>
+                        </div>
+                        <div class="task-description">كتالوج شامل لمشاريع الشركة</div>
+                        <div class="task-meta">
+                            <div class="task-assignee">
+                                <div class="assignee-avatar" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">ر.م</div>
+                                <div class="assignee-name">رنا محمد</div>
+                            </div>
+                            <div class="task-tags">
+                                <div class="task-tag">تسويق</div>
+                            </div>
+                        </div>
+                        <div class="task-footer">
+                            <div class="task-date">✅ 1 فبراير</div>
+                            <div class="task-kpi" style="background: #d1fae5; color: #059669;">⭐ 35 نقطة</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Drag and Drop Functionality
+        const cards = document.querySelectorAll('.task-card');
+        const lists = document.querySelectorAll('.card-list');
+
+        let draggedCard = null;
+
+        cards.forEach(card => {
+            card.addEventListener('dragstart', function(e) {
+                draggedCard = this;
+                this.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            });
+
+            card.addEventListener('dragend', function(e) {
+                this.classList.remove('dragging');
+                lists.forEach(list => list.classList.remove('drag-over'));
+            });
+        });
+
+        lists.forEach(list => {
+            list.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+                e.dataTransfer.dropEffect = 'move';
+            });
+
+            list.addEventListener('dragleave', function(e) {
+                this.classList.remove('drag-over');
+            });
+
+            list.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('drag-over');
+                
+                if (draggedCard) {
+                    this.appendChild(draggedCard);
+                    
+                    // Update column counts
+                    updateColumnCounts();
+                }
+            });
+        });
+
+        function updateColumnCounts() {
+            lists.forEach(list => {
+                const count = list.querySelectorAll('.task-card').length;
+                const column = list.closest('.kanban-column');
+                const countElement = column.querySelector('.column-count');
+                countElement.textContent = count;
+            });
+
+            // Update stats bar
+            const backlogCount = document.querySelector('[data-status="backlog"]').children.length;
+            const todoCount = document.querySelector('[data-status="todo"]').children.length;
+            const progressCount = document.querySelector('[data-status="progress"]').children.length;
+            const reviewCount = document.querySelector('[data-status="review"]').children.length;
+            const doneCount = document.querySelector('[data-status="done"]').children.length;
+
+            const statValues = document.querySelectorAll('.stat-value');
+            statValues[0].textContent = backlogCount;
+            statValues[1].textContent = todoCount;
+            statValues[2].textContent = progressCount;
+            statValues[3].textContent = reviewCount;
+            statValues[4].textContent = doneCount;
+        }
+    </script>
+</body>
+</html>
