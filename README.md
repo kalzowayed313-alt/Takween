@@ -1,390 +1,20 @@
-# 🏗️ نظام إدارة الموظفين والمهام - شركة تكوين للهندسة
-
-<div dir="rtl">
-
-نظام متكامل لإدارة الموظفين والمهام والمشاريع الهندسية مبني بتقنيات حديثة مع دعم كامل لـ Kanban, Scrum, ونظام KPI متقدم.
-
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
----
+# Run and deploy your AI Studio app
 
-## 🚀 التقنيات المستخدمة
+This contains everything you need to run your app locally.
 
-- **Frontend & Backend:** Next.js 14 (App Router)
-- **Database:** PostgreSQL + Prisma ORM
-- **Authentication:** NextAuth.js (Google OAuth + Credentials)
-- **Styling:** Tailwind CSS
-- **Language:** TypeScript
-- **Charts:** Chart.js + React Chart.js 2
-- **Drag & Drop:** React Beautiful DnD
-- **State Management:** TanStack Query (React Query)
+View your app in AI Studio: https://ai.studio/apps/temp/1
 
----
+## Run Locally
 
-## ✨ المميزات
+**Prerequisites:**  Node.js
 
-### 🎯 إدارة المهام
-- ✅ لوحة Kanban تفاعلية (5 حالات)
-- ✅ نظام Scrum مع السبرنتات
-- ✅ 3 مستويات أولوية
-- ✅ رفع ملفات متعدد (PDF, AutoCAD, Images, Videos)
-- ✅ التعليقات والمرفقات
-- ✅ تتبع الوقت المقدر والفعلي
 
-### 👥 إدارة الموظفين
-- ✅ 48 موظف في 6 أقسام
-- ✅ 4 مستويات صلاحيات
-- ✅ بطاقات تفاعلية لكل موظف
-- ✅ تتبع KPI فردي وجماعي
-
-### 📈 نظام KPI
-- ✅ حساب أداء شهري تلقائي
-- ✅ نقاط مكافأة لكل مهمة
-- ✅ تقارير مفصلة
-- ✅ مقارنة الأقسام
-
-### ⏰ تسجيل الحضور
-- ✅ Check-in / Check-out
-- ✅ طلبات الإجازات
-- ✅ سجل شهري
-- ✅ إحصائيات الحضور
-
-### 🔐 الأمان
-- ✅ تشفير كلمات المرور (bcrypt)
-- ✅ JWT Authentication
-- ✅ Google OAuth 2.0
-- ✅ Role-based Access Control
-
----
-
-## 📦 التثبيت والإعداد
-
-### المتطلبات الأساسية
-
-```bash
-Node.js >= 18.0.0
-PostgreSQL >= 14
-npm أو yarn
-```
-
-### 1. استنساخ المشروع
-
-```bash
-git clone https://github.com/your-username/takween-management-system.git
-cd takween-management-system
-```
-
-### 2. تثبيت المكتبات
-
-```bash
-npm install
-# أو
-yarn install
-```
-
-### 3. إعداد قاعدة البيانات
-
-قم بإنشاء قاعدة بيانات PostgreSQL:
-
-```sql
-CREATE DATABASE takween;
-```
-
-### 4. إعداد متغيرات البيئة
-
-انسخ ملف `.env.example` إلى `.env`:
-
-```bash
-cp .env.example .env
-```
-
-ثم قم بتعديل المتغيرات:
-
-```env
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/takween?schema=public"
-
-# NextAuth
-NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="your-secret-key-here"
-
-# Google OAuth (اختياري)
-GOOGLE_CLIENT_ID="your-google-client-id"
-GOOGLE_CLIENT_SECRET="your-google-client-secret"
-```
-
-### 5. إعداد Prisma
-
-```bash
-# توليد Prisma Client
-npx prisma generate
-
-# تشغيل Migrations
-npx prisma migrate dev --name init
-
-# (اختياري) إضافة بيانات تجريبية
-npx prisma db seed
-```
-
-### 6. تشغيل المشروع
-
-```bash
-npm run dev
-# أو
-yarn dev
-```
-
-افتح المتصفح على: **http://localhost:3000**
-
----
-
-## 📁 هيكل المشروع
-
-```
-takween-management-system/
-├── prisma/
-│   ├── schema.prisma          # نموذج قاعدة البيانات
-│   └── migrations/            # ملفات الترحيل
-│
-├── src/
-│   ├── app/
-│   │   ├── api/              # API Routes
-│   │   │   ├── auth/         # المصادقة
-│   │   │   ├── tasks/        # المهام
-│   │   │   ├── users/        # المستخدمين
-│   │   │   └── ...
-│   │   │
-│   │   ├── (auth)/           # صفحات المصادقة
-│   │   │   └── login/
-│   │   │
-│   │   ├── (dashboard)/      # صفحات النظام
-│   │   │   ├── admin/
-│   │   │   ├── employee/
-│   │   │   └── ...
-│   │   │
-│   │   └── layout.tsx        # التخطيط الرئيسي
-│   │
-│   ├── components/           # المكونات القابلة لإعادة الاستخدام
-│   │   ├── ui/
-│   │   ├── dashboard/
-│   │   └── tasks/
-│   │
-│   ├── lib/                  # المكتبات والأدوات
-│   │   ├── auth.ts          # إعدادات NextAuth
-│   │   ├── prisma.ts        # Prisma Client
-│   │   └── utils.ts
-│   │
-│   └── types/                # أنواع TypeScript
-│
-├── public/                   # الملفات العامة
-├── .env.example             # مثال متغيرات البيئة
-├── package.json
-└── README.md
-```
-
----
-
-## 🔐 الصلاحيات والأدوار
-
-### 1. ADMIN (مدير النظام)
-- ✅ الوصول الكامل لجميع الميزات
-- ✅ إدارة جميع الموظفين
-- ✅ إنشاء/تعديل/حذف المهام
-- ✅ عرض جميع التقارير
-- ✅ تعديل الصلاحيات
-
-### 2. DEPT_MANAGER (مدير القسم)
-- ✅ إدارة موظفي قسمه
-- ✅ إنشاء مهام لقسمه
-- ✅ الموافقة على الإجازات
-- ✅ عرض تقارير القسم
-- ❌ الوصول لأقسام أخرى
-
-### 3. TEAM_LEADER (قائد الفريق)
-- ✅ إنشاء وتعيين المهام
-- ✅ مراجعة مهام الفريق
-- ✅ عرض تقارير الفريق
-- ❌ حذف موظفين
-
-### 4. EMPLOYEE (موظف)
-- ✅ عرض مهامه الشخصية
-- ✅ تحديث حالة مهامه
-- ✅ رفع ملفات
-- ✅ تسجيل الحضور
-- ❌ رؤية مهام الآخرين
-
----
-
-## 📡 API Endpoints
-
-### Authentication
-
-```
-POST   /api/auth/register       # تسجيل موظف جديد
-POST   /api/auth/login          # تسجيل الدخول
-GET    /api/auth/google         # تسجيل دخول Google
-POST   /api/auth/logout         # تسجيل الخروج
-```
-
-### Users
-
-```
-GET    /api/users               # جلب جميع الموظفين
-GET    /api/users/[id]          # جلب موظف محدد
-POST   /api/users               # إضافة موظف
-PUT    /api/users/[id]          # تحديث موظف
-DELETE /api/users/[id]          # حذف موظف
-```
-
-### Tasks
-
-```
-GET    /api/tasks               # جلب جميع المهام
-GET    /api/tasks/[id]          # جلب مهمة محددة
-POST   /api/tasks               # إنشاء مهمة
-PATCH  /api/tasks/[id]          # تحديث مهمة
-DELETE /api/tasks/[id]          # حذف مهمة
-POST   /api/tasks/[id]/comments # إضافة تعليق
-POST   /api/tasks/[id]/attachments # رفع مرفق
-```
-
-### Departments
-
-```
-GET    /api/departments         # جلب جميع الأقسام
-GET    /api/departments/[id]/stats # إحصائيات القسم
-```
-
-### KPI
-
-```
-GET    /api/kpi/user/[id]      # KPI الموظف
-GET    /api/kpi/department/[id] # KPI القسم
-GET    /api/kpi/company         # KPI الشركة
-```
-
-### Attendance
-
-```
-POST   /api/attendance/check-in  # تسجيل حضور
-POST   /api/attendance/check-out # تسجيل انصراف
-GET    /api/attendance/user/[id] # سجل الحضور
-```
-
----
-
-## 🎨 الأقسام في الشركة
-
-1. **قسم المعماري** (8 موظفين) - `#2563eb`
-2. **قسم الإنشائي** (7 موظفين) - `#10b981`
-3. **قسم التصميم الداخلي** (6 موظفين) - `#ec4899`
-4. **قسم التسويق** (5 موظفين) - `#8b5cf6`
-5. **قسم الموارد البشرية** (4 موظفين) - `#06b6d4`
-6. **قسم المحاسبة** (3 موظفين) - `#ef4444`
-
----
-
-## 🧪 الاختبار
-
-```bash
-# Unit Tests
-npm run test
-
-# E2E Tests
-npm run test:e2e
-
-# Coverage
-npm run test:coverage
-```
-
----
-
-## 🚢 النشر (Deployment)
-
-### Vercel (موصى به)
-
-```bash
-# ربط المشروع
-vercel
-
-# نشر للإنتاج
-vercel --prod
-```
-
-### Docker
-
-```bash
-# بناء الصورة
-docker build -t takween-system .
-
-# تشغيل الحاوية
-docker run -p 3000:3000 takween-system
-```
-
----
-
-## 🔧 البيئات
-
-### Development
-
-```bash
-npm run dev
-```
-
-### Production Build
-
-```bash
-npm run build
-npm start
-```
-
----
-
-## 📚 الوثائق الإضافية
-
-- [دليل المستخدم](./docs/user-guide.md)
-- [API Documentation](./docs/api.md)
-- [دليل التطوير](./docs/development.md)
-
----
-
-## 🤝 المساهمة
-
-نرحب بالمساهمات! يرجى:
-
-1. Fork المشروع
-2. إنشاء فرع للميزة (`git checkout -b feature/amazing-feature`)
-3. Commit التغييرات (`git commit -m 'Add amazing feature'`)
-4. Push للفرع (`git push origin feature/amazing-feature`)
-5. فتح Pull Request
-
----
-
-## 📝 الترخيص
-
-© 2026 شركة تكوين للهندسة. جميع الحقوق محفوظة.
-
----
-
-## 📞 الدعم
-
-- 📧 البريد: support@takween.com
-- 🌐 الموقع: www.takween.com
-- 📱 الهاتف: +973 XXXX XXXX
-
----
-
-## 🙏 شكر وتقدير
-
-تم بناء هذا النظام باستخدام أفضل التقنيات الحديثة:
-- [Next.js](https://nextjs.org)
-- [Prisma](https://prisma.io)
-- [NextAuth.js](https://next-auth.js.org)
-- [Tailwind CSS](https://tailwindcss.com)
-- [Chart.js](https://chartjs.org)
-
----
-
-**⭐ إذا أعجبك المشروع، لا تنسَ إعطاءه نجمة على GitHub!**
-
-</div>
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`
